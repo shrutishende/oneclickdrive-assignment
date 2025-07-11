@@ -1,9 +1,13 @@
 "use client";
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
 import * as Yup from "yup";
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { Status } from "@/lib/car";
+import Header from "./Header";
+import Button from "@mui/material/Button";
+import { useRouter } from "next/navigation";
+import { Snackbar, Alert } from "@mui/material";
 
 interface Car {
     id: string;
@@ -25,91 +29,170 @@ const validationSchema = Yup.object({
 });
 
 const EditForm = ({ car }: EditFormProps) => {
-    const { getToken } = useAuth();
-    console.log(car);
+    const [alert, setAlert] = useState({
+        open: false,
+        message: "",
+        severity: "success",
+    });
+    const router = useRouter();
+
     return (
-        <div>
-            <Formik
-                initialValues={{
-                    id: car.id,
-                    name: car.name,
-                    price: car.price,
-                    status: car.status,
-                }}
-                validationSchema={validationSchema}
-                onSubmit={async (
-                    values: Car,
-                    { setSubmitting }: FormikHelpers<Car>
-                ) => {
-                    try {
-                        const token = await getToken();
-                        console.log(token);
-                        const res = await fetch(`/api/cars/${car.id}`, {
-                            method: "PUT",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(values),
-                        });
-                        console.log("res");
-                    } catch (error) {
-                        console.log("Error updating car");
-                    }
-                }}
+        <>
+            <Header />
+            <Snackbar
+                open={alert.open}
+                autoHideDuration={3000}
+                onClose={() =>
+                    setAlert({
+                        open: false,
+                        message: "",
+                        severity: "success",
+                    })
+                }
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
             >
-                <Form>
-                    <div>
-                        <label htmlFor="name">Car Name</label>
-                        <Field id="name" name="name" className="border" />
-                        <ErrorMessage
-                            name="name"
-                            component="div"
-                            className="text-red-500 text-sm mt-1"
-                        />
-                    </div>
+                <Alert
+                    severity={alert.severity}
+                    onClose={() =>
+                        setAlert({
+                            open: false,
+                            message: "",
+                            severity: "success",
+                        })
+                    }
+                >
+                    <p className="text-sm font-bold space-x-1">
+                        {alert.message}
+                    </p>
+                </Alert>
+            </Snackbar>
 
-                    <div>
-                        <label htmlFor="price">Price</label>
-                        <Field id="price" name="price" className="border" />
-                        <ErrorMessage
-                            name="price"
-                            component="div"
-                            className="text-red-500 text-sm mt-1"
-                        />
-                    </div>
+            <div className="bg-neutral-900 h-screen  mx-auto flex justify-center py-10">
+                <Formik
+                    initialValues={{
+                        id: car.id,
+                        name: car.name,
+                        price: car.price,
+                        status: car.status,
+                    }}
+                    validationSchema={validationSchema}
+                    onSubmit={async (
+                        values: Car,
+                        { setSubmitting }: FormikHelpers<Car>
+                    ) => {
+                    try {
+                            const res = await fetch(`/api/cars/${car.id}`, {
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify(values),
+                            });
+                            if (res.ok) {
+                                setAlert({
+                                    open: true,
+                                    message: `Car ${car.name} details saved!`,
+                                    severity: "success",
+                                });
+                                router.refresh();
+                            } else {
+                                setAlert({
+                                    open: true,
+                                    message: `Failed to save car  detals.`,
+                                    severity: "error",
+                                });
+                            }
+                        } catch (error) {
+                            setAlert({
+                                open: true,
+                                message: `Error updating car details: ${error.message}`,
+                                severity: "error",
+                            });
+                        }
+                    }}
+                >
+                    <Form>
+                        <p className="text-white text-2xl">Edit Car Details</p>
+                        <div className="mt-5">
+                            <label
+                                htmlFor="name"
+                                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                            >
+                                Car Name
+                            </label>
+                            <Field
+                                id="name"
+                                name="name"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            />
+                            <ErrorMessage
+                                name="name"
+                                component="div"
+                                className="text-red-500 text-sm mt-1"
+                            />
+                        </div>
 
-                    <div role="group" aria-labelledby="my-radio-group">
-                        <label>
+                        <div className="mt-5">
+                            <label
+                                htmlFor="price"
+                                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                            >
+                                Price
+                            </label>
                             <Field
-                                type="radio"
-                                name="status"
-                                value={Status.Pending}
+                                id="price"
+                                name="price"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             />
-                            Pending
-                        </label>
-                        <label>
-                            <Field
-                                type="radio"
-                                name="status"
-                                value={Status.Approved}
+                            <ErrorMessage
+                                name="price"
+                                component="div"
+                                className="text-red-500 text-sm mt-1"
                             />
-                            Approved
-                        </label>
-                        <label>
-                            <Field
-                                type="radio"
-                                name="status"
-                                value={Status.Rejected}
-                            />
-                            Rejected
-                        </label>
-                        {/* <div>Picked: {values.picked}</div> */}
-                    </div>
+                        </div>
 
-                    <button type="submit">Save</button>
-                </Form>
-            </Formik>
-        </div>
+                        <div
+                            role="group"
+                            aria-labelledby="my-radio-group"
+                            className="block mt-5 text-sm font-medium text-gray-900 dark:text-white"
+                        >
+                            <label className="p-2">
+                                <Field
+                                    type="radio"
+                                    name="status"
+                                    value={Status.Pending}
+                                    className="p-2"
+                                />
+                                Pending
+                            </label>
+                            <label className="p-2">
+                                <Field
+                                    type="radio"
+                                    name="status"
+                                    value={Status.Approved}
+                                    className="p-2"
+                                />
+                                Approved
+                            </label>
+                            <label className="p-2">
+                                <Field
+                                    type="radio"
+                                    name="status"
+                                    value={Status.Rejected}
+                                    className="p-2"
+                                />
+                                Rejected
+                            </label>
+                        </div>
+                        <div className="mt-5">
+                            <Button variant="contained" type="submit">
+                                Save
+                            </Button>
+                        </div>
+                    </Form>
+                </Formik>
+            </div>
+        </>
     );
 };
 

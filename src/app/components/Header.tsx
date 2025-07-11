@@ -1,28 +1,26 @@
 "use client";
 import { UserButton, useUser } from "@clerk/nextjs";
+import { Button } from "@mui/material";
 import Link from "next/link";
 import React from "react";
 
 function Header() {
     const { user, isSignedIn } = useUser();
     return (
-        <div className="flex justify-between shadow-md p-3 px-5">
-            <h1 className="font-bold font-sans text-blue-400 text-2xl">
-                ONECLICKDRIVE
-            </h1>
-            {isSignedIn ? (
-                <div className="flex gap-2 items-center">
-                    <button>
-                        <UserButton />
-                    </button>
-                </div>
-            ) : (
-               //  <Link href="/sign-in">
-               //      <button>Get Started</button>
-                        //  </Link>
-                        null
-            )}
-        </div>
+        <header className="bg-black  text-white p-2">
+            <div className="container mx-auto flex justify-between  items-center">
+                <Link href="/" className="text-xl font-bold  md:block">
+                    OneClickDrive
+                </Link>
+                {isSignedIn ? (
+                    <div className="bg-black border border-white rounded-xl py-1">
+                        <Button className=" hover:bg-gray-800">
+                            <UserButton />
+                        </Button>
+                    </div>
+                ) : null}
+            </div>
+        </header>
     );
 }
 

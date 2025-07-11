@@ -5,11 +5,11 @@ import Pagination from "@mui/material/Pagination";
 import { Car } from "@/generated/prisma";
 import { Status } from "@/lib/car";
 import { useRouter, useSearchParams } from "next/navigation";
-import AlertTitle from "@mui/material/AlertTitle";
 import Alert from "@mui/material/Alert";
-import { Button, dividerClasses, Snackbar } from "@mui/material";
+import { Button, Snackbar } from "@mui/material";
+import Image from "next/image";
 
-const CarList = ({ cars, page, totalPages }) => {
+const CarList = ({ cars, page }) => {
     const [currentPage, setCurrentPage] = useState(page);
     const [currentCars, setCurrentCars] = useState([]);
     const [statusFilter, setStatusFilter] = useState("");
@@ -31,7 +31,6 @@ const CarList = ({ cars, page, totalPages }) => {
                 },
                 body: JSON.stringify(car),
             });
-            // Refresh the page to reflect updated status
 
             if (res.ok) {
                 setAlert({
@@ -78,7 +77,7 @@ const CarList = ({ cars, page, totalPages }) => {
             filteredcars = cars.filter(
                 (car) => car.status.toLowerCase() === statusFilter.toLowerCase()
             );
-            console.log("filter car", filteredcars);
+            // console.log("filter car", filteredcars);
         }
         // Apply pagination
         const startIndex = (currentPage - 1) * 10;
@@ -113,12 +112,16 @@ const CarList = ({ cars, page, totalPages }) => {
     }, [searchParams]);
 
     return (
-        <div>
+        <section className="mx-auto  px-4  w-full sm:px-6 ">
             <Snackbar
                 open={alert.open}
                 autoHideDuration={3000}
                 onClose={() =>
-                    setAlert({ open: false, message: "", severity: "success" })
+                    setAlert({
+                        open: false,
+                        message: "",
+                        severity: "success",
+                    })
                 }
                 anchorOrigin={{ vertical: "top", horizontal: "center" }}
             >
@@ -132,47 +135,107 @@ const CarList = ({ cars, page, totalPages }) => {
                         })
                     }
                 >
-                    {alert.message}
+                    <p className="text-sm font-bold space-x-1">
+                        {alert.message}
+                    </p>
                 </Alert>
             </Snackbar>
-            <label className="mr-2">Filter by status:</label>
-            <select
-                value={statusFilter}
-                onChange={(e) => handleFilterChange(e.target.value || null)}
-            >
-                <option value="">All</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-            </select>
 
-            <div>
-                <ul className="flex flex-col gap-y-2">
-                    {currentCars.map((car) => (
-                        <div key={car.id}>
-                            <li key={car.id}>{car.name}</li>
-                            <Button
-                                onClick={() =>
-                                    updateStatus(car, Status.Approved)
-                                }
-                                disabled={car.status === Status.Approved}
-                            >
-                                Approve
-                            </Button>
-                            <Button
-                                onClick={() =>
-                                    updateStatus(car, Status.Rejected)
-                                }
-                                disabled={car.status === Status.Rejected}
-                            >
-                                Reject
-                            </Button>
-                            <Link href={`edit/${car.id}`}>
-                                <button>Edit</button>
-                            </Link>
+            <div className="flex items-center justify-center">
+                <label
+                    htmlFor="status"
+                    className="block mb-2 text-lg text-gray-900 dark:text-white p-2 "
+                >
+                    Filter by status:
+                </label>
+                <select
+                    value={statusFilter}
+                    onChange={(e) => handleFilterChange(e.target.value || null)}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[20%] p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                    <option value="">All</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+
+            <div className="grid  mt-10  grid-rows-1 mx-auto bg-black ">
+                {currentCars.map((car) => (
+                    <div key={car.id}>
+                        <div className="flex items-center justify-center gap-20 overflow-hidden rounded-lg border bg-white  dark:bg-black relative border-neutral-200 dark:border-neutral-800">
+                            <Image
+                                src={car.image_url || null}
+                                alt="image"
+                                width={300}
+                                height={500}
+                                className="object-cover rounded-2xl mt-8 mb-8"
+                            />
+                            <div className="block items-center ">
+                                <h3 className="text-xl font-bold text-white">
+                                    {car.name}
+                                </h3>
+                                <p className="text-blue-600 mt-2 mb-2">
+                                    ${car.price}
+                                </p>
+
+                                <Button
+                                    variant="contained"
+                                    className="custom-disabled-button "
+                                    onClick={() =>
+                                        updateStatus(car, Status.Approved)
+                                    }
+                                    disabled={car.status === Status.Approved}
+                                    sx={{
+                                        // Style for disabled state
+                                        "&.Mui-disabled": {
+                                            backgroundColor: "#555", // Visible gray background for disabled state
+                                            color: "#ccc", // Light text color for contrast
+                                            opacity: 1,
+                                        },
+                                    }}
+                                >
+                                    Approve
+                                </Button>
+
+                                <Button
+                                    variant="contained"
+                                    onClick={() =>
+                                        updateStatus(car, Status.Rejected)
+                                    }
+                                    className="custom-disabled-button "
+                                    disabled={car.status === Status.Rejected}
+                                    sx={{
+                                        // Style for disabled state
+                                        "&.Mui-disabled": {
+                                            backgroundColor: "#555", // Visible gray background for disabled state
+                                            color: "#ccc", // Light text color for contrast
+                                            opacity: 1,
+                                        },
+                                    }}
+                                >
+                                    Reject
+                                </Button>
+                                <Link href={`edit/${car.id}`}>
+                                    <Button
+                                        variant="contained"
+                                        sx={{
+                                            opacity: 1,
+                                        }}
+                                    >
+                                        Edit
+                                    </Button>
+                                </Link>
+                            </div>
                         </div>
-                    ))}
-                </ul>
+                    </div>
+                ))}
+            </div>
+
+            <div
+                style={{ backgroundColor: "#000", padding: "20px" }}
+                className="flex  items-center justify-center  mt-8"
+            >
                 <Pagination
                     count={Math.ceil(
                         (statusFilter
@@ -185,9 +248,31 @@ const CarList = ({ cars, page, totalPages }) => {
                     )}
                     page={currentPage}
                     onChange={handlePageChange}
+                    sx={{
+                        "& .MuiPaginationItem-root": {
+                            color: "#fff",
+                            backgroundColor: "rgba(255, 255, 255, 0.1)",
+                            "&:hover": {
+                                backgroundColor: "rgba(255, 255, 255, 0.2)",
+                            },
+                            "&.Mui-selected": {
+                                backgroundColor: "#fff",
+                                color: "#000",
+                                "&:hover": {
+                                    backgroundColor: "#e0e0e0",
+                                },
+                            },
+                        },
+                        "& .MuiPaginationItem-ellipsis": {
+                            color: "#fff",
+                        },
+                        "& .MuiPaginationItem-icon": {
+                            color: "#fff",
+                        },
+                    }}
                 />
             </div>
-        </div>
+        </section>
     );
 };
 

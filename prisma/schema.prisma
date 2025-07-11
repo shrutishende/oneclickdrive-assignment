@@ -15,5 +15,6 @@ model Car{
   id      String   @id @default(cuid())
   name    String
   price    Int 
+  image_url String
   status    String    @default("pending")
 }

@@ -6,9 +6,13 @@ export async function PUT(
     request: Request,
     { params }: { params: Promise<{ slug: string }> }
 ) {
+    console.log("11111111111111");
     const { slug } = await params;
     const { name, price, status } = await request.json();
 
+    console.log(name);
+    console.log(price);
+    console.log(status);
     if (!name || !price) {
         return NextResponse.json(
             { error: "Missing required fields" },
@@ -28,10 +32,11 @@ export async function PUT(
             id: slug,
         },
         data: {
-            name,
-            price,
-            status,
+            name: name,
+            price: parseInt(price),
+            status: status,
         },
     });
+    // console.log("car api",car)
     return NextResponse.json({ message: "Car updated" });
 }
