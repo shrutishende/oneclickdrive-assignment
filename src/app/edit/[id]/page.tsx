@@ -2,16 +2,14 @@ import EditForm from "@/app/components/EditForm";
 import { prisma } from "@/lib/prisma";
 import React from "react";
 
-async function page({ params }: { params: Promise<{ slug: string }> }) {
-    const { slug } = await params;
+async function page({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
 
     const car = await prisma.car.findUnique({
         where: {
-            id: slug,
+            id: id,
         },
     });
-
-   
 
     if (!car) {
         return (

@@ -4,15 +4,10 @@ import { NextResponse } from "next/server";
 
 export async function PUT(
     request: Request,
-    { params }: { params: Promise<{ slug: string }> }
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    console.log("11111111111111");
-    const { slug } = await params;
+    const { id } = await params;
     const { name, price, status } = await request.json();
-
-    console.log(name);
-    console.log(price);
-    console.log(status);
     if (!name || !price) {
         return NextResponse.json(
             { error: "Missing required fields" },
@@ -29,7 +24,7 @@ export async function PUT(
 
     const car = await prisma.car.update({
         where: {
-            id: slug,
+            id: id,
         },
         data: {
             name: name,
@@ -37,6 +32,5 @@ export async function PUT(
             status: status,
         },
     });
-    // console.log("car api",car)
     return NextResponse.json({ message: "Car updated" });
 }
