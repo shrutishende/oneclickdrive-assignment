@@ -2,18 +2,18 @@
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import React, { useState } from "react";
-import { useAuth } from "@clerk/nextjs";
 import { Status } from "@/lib/car";
 import Header from "./Header";
 import Button from "@mui/material/Button";
 import { useRouter } from "next/navigation";
 import { Snackbar, Alert } from "@mui/material";
 
-interface Car {
+export interface Car {
     id: string;
     name: string;
     price: number;
     status: string;
+    image_url: string;
 }
 
 interface EditFormProps {
@@ -32,7 +32,7 @@ const EditForm = ({ car }: EditFormProps) => {
     const [alert, setAlert] = useState({
         open: false,
         message: "",
-        severity: "success",
+        severity: "success" as "success" | "error",
     });
     const router = useRouter();
 
@@ -74,13 +74,14 @@ const EditForm = ({ car }: EditFormProps) => {
                         name: car.name,
                         price: car.price,
                         status: car.status,
+                        image_url: car.image_url,
                     }}
                     validationSchema={validationSchema}
                     onSubmit={async (
                         values: Car,
                         { setSubmitting }: FormikHelpers<Car>
                     ) => {
-                    try {
+                        try {
                             const res = await fetch(`/api/cars/${car.id}`, {
                                 method: "PUT",
                                 headers: {
@@ -88,7 +89,7 @@ const EditForm = ({ car }: EditFormProps) => {
                                 },
                                 body: JSON.stringify(values),
                             });
-                        
+
                             if (res.ok) {
                                 setAlert({
                                     open: true,
@@ -103,14 +104,15 @@ const EditForm = ({ car }: EditFormProps) => {
                                     severity: "error",
                                 });
                             }
-                        } catch (error) {
+                        } catch (error: unknown) {
                             setAlert({
                                 open: true,
-                                message: `Error updating car details: ${error.message}`,
+                                message: `Error updating car details: ${
+                                    (error as Error).message
+                                }`,
                                 severity: "error",
                             });
-                    }
-                        
+                        }
                     }}
                 >
                     <Form>

@@ -11,7 +11,7 @@ async function page({ params }: { params: Promise<{ slug: string }> }) {
         },
     });
 
-   // console.log(car)
+   
 
     if (!car) {
         return (

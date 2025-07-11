@@ -5,12 +5,15 @@ import CarList from "./components/CarList";
 export default async function Home({
     searchParams,
 }: {
-    searchParams: { page?: string; status?: string };
-}) {
-    const page = await parseInt(searchParams.page || "1", 10);
-
+    // searchParams: { page?: string; status?: string };
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+    }) {
+        const params = await searchParams;
+   // const page = await parseInt(searchParams.page || "1", 10);
+   const page = parseInt(params.page?.toString() || "1", 10) || 1;
     const cars = await prisma.car.findMany();
-
+    // const status =
+    //     typeof params.status === "string" ? params.status : undefined;
     return (
         <div>
             <Header />

@@ -2,21 +2,26 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Pagination from "@mui/material/Pagination";
-import { Car } from "@/generated/prisma";
 import { Status } from "@/lib/car";
 import { useRouter, useSearchParams } from "next/navigation";
 import Alert from "@mui/material/Alert";
 import { Button, Snackbar } from "@mui/material";
 import Image from "next/image";
+import { Car } from "./EditForm";
 
-const CarList = ({ cars, page }) => {
+interface CarListProps {
+    page: number;
+    cars: Car[];
+}
+
+const CarList = ({ cars, page }: CarListProps) => {
     const [currentPage, setCurrentPage] = useState(page);
-    const [currentCars, setCurrentCars] = useState([]);
+    const [currentCars, setCurrentCars] = useState<Car[]>([]);
     const [statusFilter, setStatusFilter] = useState("");
     const [alert, setAlert] = useState({
         open: false,
         message: "",
-        severity: "success",
+        severity: "success" as "success" | "error",
     });
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -46,16 +51,18 @@ const CarList = ({ cars, page }) => {
                     severity: "error",
                 });
             }
-        } catch (error) {
+        } catch (error: unknown) {
             setAlert({
                 open: true,
-                message: `Error updating car status: ${error.message}`,
+                message: `Error updating car status: ${
+                    (error as Error).message
+                }`,
                 severity: "error",
             });
         }
     };
 
-    const handleFilterChange = (newStatus: string | null) => {
+    const handleFilterChange = (newStatus: string) => {
         setStatusFilter(newStatus);
         setCurrentPage(1);
         const params = new URLSearchParams(searchParams);
@@ -77,7 +84,6 @@ const CarList = ({ cars, page }) => {
             filteredcars = cars.filter(
                 (car) => car.status.toLowerCase() === statusFilter.toLowerCase()
             );
-            // console.log("filter car", filteredcars);
         }
         // Apply pagination
         const startIndex = (currentPage - 1) * 10;
@@ -150,7 +156,7 @@ const CarList = ({ cars, page }) => {
                 </label>
                 <select
                     value={statusFilter}
-                    onChange={(e) => handleFilterChange(e.target.value || null)}
+                    onChange={(e) => handleFilterChange(e.target.value)}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[20%] p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
                     <option value="">All</option>
@@ -166,7 +172,7 @@ const CarList = ({ cars, page }) => {
                         <div className="flex items-center justify-center md:gap-20 gap-10 max-sm:gap-3 overflow-hidden rounded-lg border bg-white  dark:bg-black relative border-neutral-200 dark:border-neutral-800">
                             <div className="max-sm:w-[50%]">
                                 <Image
-                                    src={car.image_url || null}
+                                    src={car.image_url}
                                     alt="image"
                                     width={300}
                                     height={500}
