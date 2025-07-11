@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import React from "react";
@@ -12,15 +12,15 @@ function Header() {
             </h1>
             {isSignedIn ? (
                 <div className="flex gap-2 items-center">
-                    <Link href="/dashboard">
-                        <button> Dashboard</button>
-                    </Link>
-                    <UserButton />
+                    <button>
+                        <UserButton />
+                    </button>
                 </div>
             ) : (
-                <Link href="/sign-in">
-                    <button>Get Started</button>
-                </Link>
+               //  <Link href="/sign-in">
+               //      <button>Get Started</button>
+                        //  </Link>
+                        null
             )}
         </div>
     );
