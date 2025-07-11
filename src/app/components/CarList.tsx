@@ -141,7 +141,7 @@ const CarList = ({ cars, page }) => {
                 </Alert>
             </Snackbar>
 
-            <div className="flex items-center justify-center">
+            <div className="flex flex-col sm:flex-row items-center justify-center">
                 <label
                     htmlFor="status"
                     className="block mb-2 text-lg text-gray-900 dark:text-white p-2 "
@@ -160,72 +160,82 @@ const CarList = ({ cars, page }) => {
                 </select>
             </div>
 
-            <div className="grid  mt-10  grid-rows-1 mx-auto bg-black ">
+            <div className="grid  mt-10  grid-cols-1 mx-auto bg-black ">
                 {currentCars.map((car) => (
                     <div key={car.id}>
-                        <div className="flex items-center justify-center gap-20 overflow-hidden rounded-lg border bg-white  dark:bg-black relative border-neutral-200 dark:border-neutral-800">
-                            <Image
-                                src={car.image_url || null}
-                                alt="image"
-                                width={300}
-                                height={500}
-                                className="object-cover rounded-2xl mt-8 mb-8"
-                            />
+                        <div className="flex items-center justify-center md:gap-20 gap-10 max-sm:gap-3 overflow-hidden rounded-lg border bg-white  dark:bg-black relative border-neutral-200 dark:border-neutral-800">
+                            <div className="max-sm:w-[50%]">
+                                <Image
+                                    src={car.image_url || null}
+                                    alt="image"
+                                    width={300}
+                                    height={500}
+                                    className="object-cover rounded-2xl mt-8 mb-8 p-2"
+                                />
+                            </div>
+
                             <div className="block items-center ">
-                                <h3 className="text-xl font-bold text-white">
+                                <h3 className="text-xl font-bold text-white max-sm:text-sm">
                                     {car.name}
                                 </h3>
                                 <p className="text-blue-600 mt-2 mb-2">
                                     ${car.price}
                                 </p>
 
-                                <Button
-                                    variant="contained"
-                                    className="custom-disabled-button "
-                                    onClick={() =>
-                                        updateStatus(car, Status.Approved)
-                                    }
-                                    disabled={car.status === Status.Approved}
-                                    sx={{
-                                        // Style for disabled state
-                                        "&.Mui-disabled": {
-                                            backgroundColor: "#555", // Visible gray background for disabled state
-                                            color: "#ccc", // Light text color for contrast
-                                            opacity: 1,
-                                        },
-                                    }}
-                                >
-                                    Approve
-                                </Button>
-
-                                <Button
-                                    variant="contained"
-                                    onClick={() =>
-                                        updateStatus(car, Status.Rejected)
-                                    }
-                                    className="custom-disabled-button "
-                                    disabled={car.status === Status.Rejected}
-                                    sx={{
-                                        // Style for disabled state
-                                        "&.Mui-disabled": {
-                                            backgroundColor: "#555", // Visible gray background for disabled state
-                                            color: "#ccc", // Light text color for contrast
-                                            opacity: 1,
-                                        },
-                                    }}
-                                >
-                                    Reject
-                                </Button>
-                                <Link href={`edit/${car.id}`}>
+                                <div className="flex flex-col sm:flex-row gap-2 w-full justify-center action-button-wrapper">
                                     <Button
                                         variant="contained"
+                                        className="custom-disabled-button action-button"
+                                        onClick={() =>
+                                            updateStatus(car, Status.Approved)
+                                        }
+                                        disabled={
+                                            car.status === Status.Approved
+                                        }
                                         sx={{
-                                            opacity: 1,
+                                            // Style for disabled state
+                                            "&.Mui-disabled": {
+                                                backgroundColor: "#555", // Visible gray background for disabled state
+                                                color: "#ccc", // Light text color for contrast
+                                                opacity: 1,
+                                            },
                                         }}
                                     >
-                                        Edit
+                                        Approve
                                     </Button>
-                                </Link>
+
+                                    <Button
+                                        variant="contained"
+                                        onClick={() =>
+                                            updateStatus(car, Status.Rejected)
+                                        }
+                                        className="custom-disabled-button action-button"
+                                        disabled={
+                                            car.status === Status.Rejected
+                                        }
+                                        sx={{
+                                            // Style for disabled state
+                                            "&.Mui-disabled": {
+                                                backgroundColor: "#555", // Visible gray background for disabled state
+                                                color: "#ccc", // Light text color for contrast
+                                                opacity: 1,
+                                            },
+                                        }}
+                                    >
+                                        Reject
+                                    </Button>
+                                    <Link href={`edit/${car.id}`}>
+                                        <Button
+                                            className="action-button"
+                                            variant="contained"
+                                            sx={{
+                                                opacity: 1,
+                                            }}
+                                        >
+                                            Edit
+                                        </Button>
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>

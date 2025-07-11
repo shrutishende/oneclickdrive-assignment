@@ -88,6 +88,7 @@ const EditForm = ({ car }: EditFormProps) => {
                                 },
                                 body: JSON.stringify(values),
                             });
+                        
                             if (res.ok) {
                                 setAlert({
                                     open: true,
@@ -108,7 +109,8 @@ const EditForm = ({ car }: EditFormProps) => {
                                 message: `Error updating car details: ${error.message}`,
                                 severity: "error",
                             });
-                        }
+                    }
+                        
                     }}
                 >
                     <Form>
